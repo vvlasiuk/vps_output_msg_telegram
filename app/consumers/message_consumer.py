@@ -151,7 +151,8 @@ class MessageConsumer:
                 if keyboard:
                     from app.services.telegram_sender import get_keyboard
                     reply_markup = get_keyboard(keyboard)
-                    await self.sender.send_text(chat_id, content, reply_markup=reply_markup.to_dict())
+                    text = content if content else "Оберіть опцію:"
+                    await self.sender.send_text(chat_id, text, reply_markup=reply_markup.to_dict())
                     self.logger.info("Повідомлення типу %s відправлено chat_id=%s з кастомною клавіатурою", msg_type, chat_id)
                 else:
                     await self.sender.send_text(chat_id, content)

@@ -15,12 +15,12 @@ def load_menu_config(path="menu_config.json"):
         with open("menu_config.example.json", encoding="utf-8") as f:
             return json.load(f)
 
-def get_keyboard(menu):
+def get_keyboard(keyboard_dict):
     return ReplyKeyboardMarkup(
-        [[KeyboardButton(text) for text in row] for row in menu],
-        resize_keyboard=True,
-        one_time_keyboard=False,
-        is_persistent=True,
+        keyboard=keyboard_dict["keyboard"],
+        resize_keyboard=keyboard_dict.get("resize_keyboard", True),
+        one_time_keyboard=keyboard_dict.get("one_time_keyboard", False),
+        is_persistent=keyboard_dict.get("is_persistent", True)
     )
 
 
