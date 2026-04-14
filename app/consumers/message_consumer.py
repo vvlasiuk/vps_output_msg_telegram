@@ -143,9 +143,19 @@ class MessageConsumer:
             msg_type = str(message.get("type", "text")).lower()
             content = message.get("content")
 
+
+            # Якщо є тег 'keyboard', формуємо клавіатуру з його вмісту
+            keyboard = message.get("keyboard")
+
             if msg_type in {"text", "emoji"}:
-                await self.sender.send_text(chat_id, content)
-                self.logger.info("Повідомлення типу %s відправлено chat_id=%s", msg_type, chat_id)
+                if keyboard:
+                    from app.services.telegram_sender import get_keyboard
+                    reply_markup = get_keyboard(keyboard)
+                    await self.sender.send_text(chat_id, content, reply_markup=reply_markup.to_dict())
+                    self.logger.info("Повідомлення типу %s відправлено chat_id=%s з кастомною клавіатурою", msg_type, chat_id)
+                else:
+                    await self.sender.send_text(chat_id, content)
+                    self.logger.info("Повідомлення типу %s відправлено chat_id=%s без клавіатури", msg_type, chat_id)
                 return
 
             if msg_type == "photo":

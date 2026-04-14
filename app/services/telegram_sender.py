@@ -3,6 +3,26 @@ from pathlib import Path
 
 import requests
 
+import json
+from telegram import ReplyKeyboardMarkup, KeyboardButton
+
+def load_menu_config(path="menu_config.json"):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # Якщо немає реального файлу, пробуємо зразок
+        with open("menu_config.example.json", encoding="utf-8") as f:
+            return json.load(f)
+
+def get_keyboard(menu):
+    return ReplyKeyboardMarkup(
+        [[KeyboardButton(text) for text in row] for row in menu],
+        resize_keyboard=True,
+        one_time_keyboard=False,
+        is_persistent=True,
+    )
+
 
 class TelegramSender:
     """Асинхронна відправка повідомлень в Telegram"""
@@ -13,12 +33,17 @@ class TelegramSender:
     def __init__(self, token):
         self.api_url = f"{self.BASE_URL}{token}"
 
-    async def send_text(self, chat_id, text):
+    async def send_text(self, chat_id, text, reply_markup=None):
+        payload = {
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML",
+        }
+        if reply_markup:
+            payload["reply_markup"] = reply_markup
         return await self._request(
             "sendMessage",
-            chat_id=chat_id,
-            text=text,
-            parse_mode="HTML",
+            **payload
         )
 
     async def send_photo(self, chat_id, file_path, caption=None):
