@@ -25,6 +25,7 @@ def get_keyboard(keyboard_dict):
 
 
 class TelegramSender:
+
     """Асинхронна відправка повідомлень в Telegram"""
 
     BASE_URL = "https://api.telegram.org/bot"
