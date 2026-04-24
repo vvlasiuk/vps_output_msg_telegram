@@ -142,9 +142,11 @@ class MessageConsumer:
         try:
             msg_type = str(message.get("type", "text")).lower()
             content = message.get("content")
+            destination = message.get("destination", {})
+
 
             if msg_type == "emoji":
-                message_id = message.get("message_id")
+                message_id = destination.get("message_id")
                 emoji = content
                 await self.sender.set_message_reaction(chat_id, message_id, emoji)
                 return
