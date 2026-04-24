@@ -143,11 +143,16 @@ class MessageConsumer:
             msg_type = str(message.get("type", "text")).lower()
             content = message.get("content")
 
+            if msg_type == "emoji":
+                message_id = message.get("message_id")
+                emoji = content
+                await self.sender.set_message_reaction(chat_id, message_id, emoji)
+                return
 
-            # Якщо є тег 'keyboard', формуємо клавіатуру з його вмісту
-            keyboard = message.get("keyboard")
+            if msg_type == "text":
+                # Якщо є тег 'keyboard', формуємо клавіатуру з його вмісту
+                keyboard = message.get("keyboard")
 
-            if msg_type in {"text", "emoji"}:
                 if keyboard:
                     from app.services.telegram_sender import get_keyboard
                     reply_markup = get_keyboard(keyboard)

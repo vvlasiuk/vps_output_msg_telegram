@@ -98,3 +98,15 @@ class TelegramSender:
             return await loop.run_in_executor(None, send)
         except requests.RequestException as exc:
             raise RuntimeError(f"Telegram API error: {exc}") from exc
+
+    async def set_message_reaction(self, chat_id, message_id, emoji, is_big=False):
+        """
+        Додає або змінює реакцію-емодзі під повідомленням.
+        """
+        payload = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "reaction": [{"type": "emoji", "emoji": emoji}],
+            "is_big": is_big,
+        }
+        return await self._request("setMessageReaction", **payload)
