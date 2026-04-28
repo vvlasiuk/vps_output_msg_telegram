@@ -17,8 +17,26 @@ def load_menu_config(path="menu_config.json"):
 
 def get_keyboard(keyboard_dict):
 
+    rows = []
+    for row in keyboard_dict["keyboard"]:
+        btn_row = []
+        for btn in row:
+            if isinstance(btn, dict) and "web_app" in btn:
+                btn_row.append(
+                    KeyboardButton(
+                        text=btn["text"],
+                        web_app=WebAppInfo(url=btn["web_app"]["url"])
+                    )
+                )
+            else:
+                btn_row.append(
+                    KeyboardButton(
+                        text=btn["text"] if isinstance(btn, dict) and "text" in btn else str(btn)
+                    )
+                )
+        rows.append(btn_row)
     return ReplyKeyboardMarkup(
-        keyboard=keyboard_dict["keyboard"],
+        keyboard=rows,
         resize_keyboard=keyboard_dict.get("resize_keyboard", True),
         one_time_keyboard=keyboard_dict.get("one_time_keyboard", False),
         is_persistent=keyboard_dict.get("is_persistent", True)
