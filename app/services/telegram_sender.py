@@ -4,7 +4,7 @@ from pathlib import Path
 import requests
 
 import json
-from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 def load_menu_config(path="menu_config.json"):
     try:
@@ -16,12 +16,50 @@ def load_menu_config(path="menu_config.json"):
             return json.load(f)
 
 def get_keyboard(keyboard_dict):
+
     return ReplyKeyboardMarkup(
         keyboard=keyboard_dict["keyboard"],
         resize_keyboard=keyboard_dict.get("resize_keyboard", True),
         one_time_keyboard=keyboard_dict.get("one_time_keyboard", False),
         is_persistent=keyboard_dict.get("is_persistent", True)
     )
+
+
+# --- NEW: Inline keyboard with web_app support ---
+def get_inline_keyboard(keyboard_dict):
+    rows = []
+    for row in keyboard_dict["inline_keyboard"]:
+        btn_row = []
+        for btn in row:
+            if "web_app" in btn:
+                btn_row.append(
+                    InlineKeyboardButton(
+                        text=btn["text"],
+                        web_app=WebAppInfo(url=btn["web_app"]["url"])
+                    )
+                )
+            elif "url" in btn:
+                btn_row.append(
+                    InlineKeyboardButton(
+                        text=btn["text"],
+                        url=btn["url"]
+                    )
+                )
+            elif "callback_data" in btn:
+                btn_row.append(
+                    InlineKeyboardButton(
+                        text=btn["text"],
+                        callback_data=btn["callback_data"]
+                    )
+                )
+            else:
+                btn_row.append(
+                    InlineKeyboardButton(
+                        text=btn["text"]
+                    )
+                )
+        rows.append(btn_row)
+    return InlineKeyboardMarkup(rows)
 
 
 class TelegramSender:
