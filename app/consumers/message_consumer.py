@@ -151,11 +151,19 @@ class MessageConsumer:
                 await self.sender.set_message_reaction(chat_id, message_id, emoji)
                 return
 
-            if msg_type == "text":
-                # Якщо є тег 'keyboard', формуємо клавіатуру з його вмісту
-                keyboard = message.get("keyboard")
 
-                if keyboard:
+            if msg_type == "text":
+                # Якщо є тег 'keyboard' або 'inline_keyboard', формуємо відповідну клавіатуру
+                keyboard = message.get("keyboard")
+                inline_keyboard = message.get("inline_keyboard")
+
+                if inline_keyboard:
+                    from app.services.telegram_sender import get_inline_keyboard
+                    reply_markup = get_inline_keyboard({"inline_keyboard": inline_keyboard})
+                    text = content if content else "Оберіть опцію:"
+                    await self.sender.send_text(chat_id, text, reply_markup=reply_markup.to_dict())
+                    self.logger.info("Повідомлення типу %s відправлено chat_id=%s з inline-клавіатурою", msg_type, chat_id)
+                elif keyboard:
                     from app.services.telegram_sender import get_keyboard
                     reply_markup = get_keyboard(keyboard)
                     text = content if content else "Оберіть опцію:"
