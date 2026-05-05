@@ -161,6 +161,11 @@ class MessageConsumer:
                     text = content if content else "Оберіть опцію:"
                     await self.sender.send_text(chat_id, text, reply_markup=reply_markup.to_dict())
                     self.logger.info("Повідомлення типу %s відправлено chat_id=%s з кастомною клавіатурою", msg_type, chat_id)
+                elif message.get("reply_markup"):
+                    text = content or ""
+                    await self.sender.send_text(chat_id, text, reply_markup=message["reply_markup"])
+                    self.logger.info("Повідомлення типу %s відправлено chat_id=%s з inline клавіатурою", msg_type, chat_id)
+
                 else:
                     await self.sender.send_text(chat_id, content)
                     self.logger.info("Повідомлення типу %s відправлено chat_id=%s без клавіатури", msg_type, chat_id)
