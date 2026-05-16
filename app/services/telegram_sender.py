@@ -96,7 +96,7 @@ class TelegramSender:
             "text": text,
             "parse_mode": "HTML",
         }
-        if reply_markup:
+        if reply_markup is not None:
             payload["reply_markup"] = reply_markup
         return await self._request(
             "sendMessage",

@@ -156,6 +156,7 @@ class MessageConsumer:
                 # Якщо є тег 'keyboard' або 'inline_keyboard', формуємо відповідну клавіатуру
                 keyboard = message.get("keyboard")
                 inline_keyboard = message.get("inline_keyboard")
+                remove_keyboard = message.get("remove_keyboard", False)
 
                 if inline_keyboard:
                     from app.services.telegram_sender import get_inline_keyboard
@@ -163,6 +164,14 @@ class MessageConsumer:
                     text = content if content else "Оберіть опцію:"
                     await self.sender.send_text(chat_id, text, reply_markup=reply_markup.to_dict())
                     self.logger.info("Повідомлення типу %s відправлено chat_id=%s з inline-клавіатурою", msg_type, chat_id)
+                elif remove_keyboard:
+                    text = content if content else ""
+                    await self.sender.send_text(
+                        chat_id,
+                        text,
+                        reply_markup={"remove_keyboard": True},
+                    )
+                    self.logger.info("Повідомлення типу %s відправлено chat_id=%s з видаленням клавіатури", msg_type, chat_id)
                 elif keyboard:
                     from app.services.telegram_sender import get_keyboard
                     reply_markup = get_keyboard(keyboard)
